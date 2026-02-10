@@ -15,22 +15,26 @@ export default function ConsentFlow({ onConsentGranted }: ConsentFlowProps) {
   const [agreeChecked, setAgreeChecked] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
-    const scrollThreshold = target.scrollHeight - target.clientHeight - 20;
-    
-    if (target.scrollTop >= scrollThreshold) {
-      setScrolledToEnd(true);
-    }
-  };
-
-  // Alternative: Allow user to enable checkbox after a few seconds as fallback
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setScrolledToEnd(true);
-    }, 3000); // Enable after 3 seconds as fallback
-    
-    return () => clearTimeout(timer);
+    const viewport = scrollAreaRef.current?.querySelector(
+      '[data-slot="scroll-area-viewport"]'
+    ) as HTMLDivElement | null;
+
+    if (!viewport) return;
+
+    const updateScrollState = () => {
+      const scrollThreshold = viewport.scrollHeight - viewport.clientHeight - 20;
+      if (scrollThreshold <= 0 || viewport.scrollTop >= scrollThreshold) {
+        setScrolledToEnd(true);
+      }
+    };
+
+    updateScrollState();
+    viewport.addEventListener('scroll', updateScrollState);
+
+    return () => {
+      viewport.removeEventListener('scroll', updateScrollState);
+    };
   }, []);
   
   const handleAgree = () => {
@@ -59,19 +63,8 @@ export default function ConsentFlow({ onConsentGranted }: ConsentFlowProps) {
         
         <CardContent className="space-y-6">
           <div className="relative">
-            <ScrollArea className="h-[400px] border rounded-lg p-6 bg-slate-50">
-              <div 
-                className="space-y-6 text-sm"
-                onScroll={(e) => {
-                  const target = e.currentTarget.parentElement;
-                  if (target) {
-                    const scrollThreshold = target.scrollHeight - target.clientHeight - 20;
-                    if (target.scrollTop >= scrollThreshold) {
-                      setScrolledToEnd(true);
-                    }
-                  }
-                }}
-              >
+            <ScrollArea ref={scrollAreaRef} className="h-[400px] border rounded-lg p-6 bg-slate-50">
+              <div className="space-y-6 text-sm">
                 <section>
                   <h3 className="text-base mb-2 flex items-center gap-2">
                     <Lock className="w-4 h-4" />

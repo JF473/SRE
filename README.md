@@ -25,7 +25,7 @@ This is a code bundle for the AR Surgery Visualizer Prototype. The original proj
    ```sh
    npm install
    npm run build
-   npx vite preview
+   npx vite preview  
    ```
    Then open [http://localhost:4173](http://localhost:4173) in your browser.
 
