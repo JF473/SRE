@@ -27,7 +27,7 @@ export default function FacialCapture({ onCaptureComplete }: FacialCaptureProps)
   const streamRef = useRef<MediaStream | null>(null);
   const luminanceIntervalRef = useRef<number | null>(null);
 
-  const MIN_LUMINANCE = 100; // 200 lux minimum as per requirements
+  const MIN_LUMINANCE = 200; // 200 lux minimum as per requirements
 
   useEffect(() => {
     // Cleanup camera stream and luminance interval on unmount

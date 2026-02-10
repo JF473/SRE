@@ -29,6 +29,12 @@ interface Procedure {
   contraindications: string[];
 }
 
+interface AllergyConflict {
+  allergens: string[];
+  procedureName: string;
+  substance: string;
+}
+
 const procedures: Procedure[] = [
   {
     id: 'dermal-filler-cheek',
@@ -75,6 +81,9 @@ const dangerZones = [
   { name: 'Infraorbital Nerve', region: 'under-eye', color: 'orange' },
 ];
 
+const DEMO_ALLERGY = 'allergy 1';
+const DEMO_PROCEDURE_ID = 'dermal-filler-cheek';
+
 export default function ProcedureSimulation({ 
   medicalHistory, 
   has3DModel,
@@ -85,34 +94,73 @@ export default function ProcedureSimulation({
   const [injectionPoints, setInjectionPoints] = useState<{x: number, y: number}[]>([]);
   const [showDangerZones, setShowDangerZones] = useState(true);
   const [simulationActive, setSimulationActive] = useState(false);
-  const [allergyWarning, setAllergyWarning] = useState<string | null>(null);
+  const normalizeToken = (value: string) =>
+    value.toLowerCase().replace(/[^a-z0-9]+/g, '');
 
-  const checkAllergies = (procedure: Procedure) => {
-    const conflicts = procedure.contraindications.filter(contra => 
-      medicalHistory.allergies.some(allergy => 
-        allergy.toLowerCase().includes(contra.toLowerCase())
+  const hasDemoAllergy = (allergies: string[]) => {
+    const joined = allergies.join(' ');
+    return /allergy\s*1/i.test(joined) || normalizeToken(joined).includes('allergy1');
+  };
+
+  const isDemoProcedure = (procedureId: string) => {
+    const normalized = normalizeToken(procedureId);
+    return normalized === normalizeToken(DEMO_PROCEDURE_ID) || normalized.includes('cheekfiller');
+  };
+
+  const getAllergyConflict = (
+    procedureId: string,
+    allergies: string[]
+  ): AllergyConflict | null => {
+    if (!procedureId) return null;
+
+    const procedure = procedures.find(p => p.id === procedureId);
+    if (!procedure) {
+      if (isDemoProcedure(procedureId) && hasDemoAllergy(allergies)) {
+        return {
+          allergens: ['Allergy 1'],
+          procedureName: 'Cheek Filler',
+          substance: 'Hyaluronic acid',
+        };
+      }
+      return null;
+    }
+
+    if (procedure.id === DEMO_PROCEDURE_ID && hasDemoAllergy(allergies)) {
+      return {
+        allergens: ['Allergy 1'],
+        procedureName: procedure.name,
+        substance: procedure.substance,
+      };
+    }
+
+    const conflicts = procedure.contraindications.filter(contra =>
+      allergies.some(allergy =>
+        normalizeToken(allergy).includes(normalizeToken(contra))
       )
     );
-    
+
     if (conflicts.length > 0) {
-      setAllergyWarning(conflicts.join(', '));
-    } else {
-      setAllergyWarning(null);
+      return {
+        allergens: conflicts,
+        procedureName: procedure.name,
+        substance: procedure.substance,
+      };
     }
+
+    return null;
   };
 
   const handleProcedureChange = (procedureId: string) => {
     setSelectedProcedure(procedureId);
-    const procedure = procedures.find(p => p.id === procedureId);
-    if (procedure) {
-      checkAllergies(procedure);
-    }
     setInjectionPoints([]);
     setSimulationActive(false);
   };
 
   const handleFaceClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!selectedProcedure || allergyWarning) return;
+    if (!selectedProcedure) return;
+
+    const conflict = getAllergyConflict(selectedProcedure, medicalHistory.allergies);
+    if (conflict) return;
     
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
@@ -143,6 +191,18 @@ export default function ProcedureSimulation({
     setInjectionPoints([]);
     setSimulationActive(false);
   };
+
+  const terminateSimulation = () => {
+    setSelectedProcedure('');
+    setInjectionPoints([]);
+    setSimulationActive(false);
+    setVolume([1.0]);
+  };
+
+  const allergyConflict = getAllergyConflict(
+    selectedProcedure,
+    medicalHistory.allergies
+  );
 
   if (!has3DModel) {
     return (
@@ -293,17 +353,26 @@ export default function ProcedureSimulation({
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Allergy Alert */}
-          {allergyWarning && (
+          {allergyConflict && (
             <Alert variant="destructive" className="bg-red-50 border-red-300">
               <AlertTriangle className="w-4 h-4" />
               <AlertDescription>
-                <p className="mb-1">⚠️ <strong>HIGH RISK - ALLERGY CONFLICT</strong></p>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-red-600 text-white text-xs px-2 py-1 rounded">HIGH RISK</span>
+                  <span className="text-sm font-semibold">Allergy/procedure conflict detected</span>
+                </div>
                 <p className="text-sm">
-                  Patient has documented allergy to: <strong>{allergyWarning}</strong>
+                  Conflict: <strong>{allergyConflict.allergens.join(', ')}</strong> with{' '}
+                  <strong>{allergyConflict.procedureName}</strong> ({allergyConflict.substance}).
                 </p>
                 <p className="text-sm mt-1">
-                  This procedure is contraindicated. Please select an alternative.
+                  Select an alternative procedure or terminate simulation.
                 </p>
+                <div className="mt-3">
+                  <Button type="button" variant="destructive" size="sm" onClick={terminateSimulation}>
+                    Terminate Simulation
+                  </Button>
+                </div>
               </AlertDescription>
             </Alert>
           )}
@@ -339,7 +408,7 @@ export default function ProcedureSimulation({
           </div>
 
           {/* Volume Control */}
-          {selectedProcedure && !allergyWarning && (
+          {selectedProcedure && !allergyConflict && (
             <div className="space-y-2">
               <div className="flex justify-between">
                 <label className="text-sm">Volume per Point</label>
@@ -392,7 +461,7 @@ export default function ProcedureSimulation({
           {/* Simulate Button */}
           <Button 
             onClick={runSimulation}
-            disabled={!selectedProcedure || allergyWarning !== null || injectionPoints.length === 0}
+            disabled={!selectedProcedure || allergyConflict !== null || injectionPoints.length === 0}
             className="w-full"
             size="lg"
           >
