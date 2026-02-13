@@ -31,6 +31,23 @@ This is a code bundle for the AR Surgery Visualizer Prototype. The original proj
 ## Deployment
 - You can deploy this app to Azure Static Web Apps, Vercel, Netlify, or any static host.
 
+## Building the Windows Executable (.exe)
+To generate the standalone `.exe` file on your machine:
+
+1. **Open Terminal as Administrator**
+   - Right-click your terminal (PowerShell or Command Prompt) and select **Run as Administrator**.
+   - *This is crucial for permission to create symbolic links.*
+
+2. **Run the Build Command**
+   ```sh
+   npm run electron:build
+   ```
+   *Note: This process may take a few minutes to complete.*
+
+3. **Find the Executable**
+   - After the command finishes, navigate to the `dist-electron` folder in the project directory.
+   - You will find the installer file there (e.g., `AR Surgery Visualizer Setup 0.0.1.exe`).
+
 ## License
 MIT
 ## Disclaimer & Testing Instructions
