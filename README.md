@@ -10,18 +10,13 @@ This is a code bundle for the AR Surgery Visualizer Prototype. The original proj
 
 ## Quick Start
 
-1. **Clone the repository**
-   ```sh
-   git clone <your-repo-url>
-   cd SRE
-   ```
-2. **Run the all-in-one script (Windows)**
+1. **Run the all-in-one script (Windows)**
    ```sh
    .\start-app.bat
    ```
    This will install dependencies, build the project, and open the preview in your browser.
 
-3. **Manual steps (if needed)**
+2. **Manual steps (if needed)**
    ```sh
    npm install
    npm run build
