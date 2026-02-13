@@ -33,7 +33,7 @@ export default defineConfig({
         ]
       }
     })
-  ],
+  ],base: './',
   resolve: {
     alias: {
       // Alias @ to the src directory

@@ -27,7 +27,7 @@ export default function FacialCapture({ onCaptureComplete }: FacialCaptureProps)
   const streamRef = useRef<MediaStream | null>(null);
   const luminanceIntervalRef = useRef<number | null>(null);
 
-  const MIN_LUMINANCE = 200; // 200 lux minimum as per requirements
+  const MIN_LUMINANCE = 150; // 150 lux minimum as per requirements
 
   useEffect(() => {
     // Cleanup camera stream and luminance interval on unmount
@@ -321,7 +321,7 @@ export default function FacialCapture({ onCaptureComplete }: FacialCaptureProps)
             <ol className="space-y-2 text-sm text-slate-600">
               <li className="flex gap-2">
                 <span className="bg-blue-100 text-blue-700 w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0">1</span>
-                <span>Ensure you're in a well-lit environment (minimum 200 lux)</span>
+                <span>Ensure you're in a well-lit environment (minimum 150 lux)</span>
               </li>
               <li className="flex gap-2">
                 <span className="bg-blue-100 text-blue-700 w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0">2</span>

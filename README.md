@@ -49,9 +49,9 @@ If the luminance (lighting) requirement is too high for your environment, you ca
 1. Open the file: `src/app/components/FacialCapture.tsx`
 2. Find the line:
    ```ts
-   const MIN_LUMINANCE = 200; // 200 lux minimum as per requirements
+   const MIN_LUMINANCE = 150; // 150 lux minimum as per requirements
    ```
-3. Change the value `200` to a lower number (e.g., `100`) to make the luminance check less strict.
+3. Change the value `150` to a lower number (e.g., `100`) to make the luminance check less strict.
 4. Save the file and restart the app if needed.
 
 This will allow the facial capture step to proceed in lower light conditions.

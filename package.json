@@ -3,9 +3,28 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "main": "electron/main.cjs",
+  "description": "AR Surgery Visualizer",
+  "author": "SRE Team",
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "electron:dev": "concurrently -k \"cross-env IS_DEV=true npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:build": "npm run build && electron-builder"
+  },
+  "build": {
+    "appId": "com.sre.visualizer",
+    "productName": "AR Surgery Visualizer",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    }
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
@@ -66,9 +85,14 @@
     "@tailwindcss/vite": "4.1.12",
     "@types/node": "^25.2.2",
     "@vitejs/plugin-react": "4.7.0",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^40.4.0",
+    "electron-builder": "^26.7.0",
     "tailwindcss": "4.1.12",
     "vite": "6.3.5",
-    "vite-plugin-pwa": "^1.2.0"
+    "vite-plugin-pwa": "^1.2.0",
+    "wait-on": "^9.0.4"
   },
   "peerDependencies": {
     "react": "18.3.1",

@@ -9,7 +9,7 @@ call npm run build
 
 echo.
 echo Starting preview server and opening browser...
-start "" http://localhost:4173
+start "" http://localhost:5173
 call npm run dev
 
 pause
