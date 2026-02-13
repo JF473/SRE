@@ -38,3 +38,20 @@ This is a code bundle for the AR Surgery Visualizer Prototype. The original proj
 
 ## License
 MIT
+## Disclaimer & Testing Instructions
+
+### Allergy Use Case
+You can test the **Allergy 1** use case by entering an allergy (Allergy 1) in the Medical History form when prompted. This will simulate a patient with an allergy and allow you to see how the app responds to allergy information when you click on "Cheek Filler".
+
+### Adjusting Luminance Level
+If the luminance (lighting) requirement is too high for your environment, you can change the minimum luminance threshold in the code:
+
+1. Open the file: `src/app/components/FacialCapture.tsx`
+2. Find the line:
+   ```ts
+   const MIN_LUMINANCE = 200; // 200 lux minimum as per requirements
+   ```
+3. Change the value `200` to a lower number (e.g., `100`) to make the luminance check less strict.
+4. Save the file and restart the app if needed.
+
+This will allow the facial capture step to proceed in lower light conditions.
